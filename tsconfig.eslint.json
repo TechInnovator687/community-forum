@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["web/src/*"],
+      "@community-forum/shared": ["shared/src/index.ts"],
+      "@community-forum/shared/*": ["shared/src/*"],
+      "@web/*": ["web/src/*"],
+      "@server/*": ["server/src/*"]
+    }
+  },
+  "include": [
+    "eslint.config.mjs",
+    "vitest.workspace.ts",
+    "shared/src/**/*.ts",
+    "shared/*.config.ts",
+    "server/src/**/*.ts",
+    "server/*.config.ts",
+    "web/app/**/*.tsx",
+    "web/src/**/*.ts",
+    "web/src/**/*.tsx",
+    "web/*.config.ts",
+    "web/next.config.ts",
+    "web/tailwind.config.ts"
+  ]
+}

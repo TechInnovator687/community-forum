@@ -1,0 +1,27 @@
+node_modules
+.next
+dist
+coverage
+.env
+.env.*
+!.env.example
+*.log
+drizzle
+.DS_Store
+*.tsbuildinfo
+
+# Local AI agent/tool state
+.agents/
+.codex/
+.claude/
+.cursor/
+.continue/
+.aider*
+.windsurf/
+.roo/
+.cline/
+.copilot/
+CLAUDE.md
+AGENTS.md
+.agent/
+.ai/

@@ -1,0 +1,37 @@
+{
+  "name": "community-forum",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20.18.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @community-forum/web --filter @community-forum/server dev",
+    "build": "pnpm -r build",
+    "start": "pnpm --parallel --filter @community-forum/web --filter @community-forum/server start",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:generate": "pnpm --filter @community-forum/server db:generate",
+    "db:migrate": "pnpm --filter @community-forum/server db:migrate",
+    "db:push": "pnpm --filter @community-forum/server db:push",
+    "db:studio": "pnpm --filter @community-forum/server db:studio",
+    "db:seed": "pnpm --filter @community-forum/server db:seed"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^22.10.7",
+    "eslint": "^9.18.0",
+    "eslint-config-next": "^15.1.4",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222 18% 12%;
+  --muted: 210 20% 96%;
+  --muted-foreground: 215 12% 42%;
+  --border: 214 20% 88%;
+  --primary: 217 91% 52%;
+  --primary-foreground: 0 0% 100%;
+  --destructive: 0 78% 55%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
