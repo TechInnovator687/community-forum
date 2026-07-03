@@ -14,14 +14,11 @@ import {
   LayoutGrid,
   Megaphone,
   MessageSquare,
-  Moon,
-  Palette,
-  Sun
+  Palette
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Avatar, Button } from "@/components/atoms";
+import { Avatar } from "@/components/atoms";
 import { useDemoUser } from "@/components/providers/DemoUserProvider";
-import { useTheme } from "@/components/providers/ThemeProvider";
 import { cn } from "@/lib/utils/ClassNames";
 import { DEFAULT_COURSE_ID } from "@/constants";
 import { useSavedPosts } from "@/hooks/queries";
@@ -78,7 +75,6 @@ export function NavSidebar() {
             <p className="truncate text-xs text-muted-foreground">{t(`role.${user.role}`)}</p>
           </div>
         </div>
-        <ThemeToggle />
       </div>
     </div>
   );
@@ -133,40 +129,5 @@ function NavLink({ href, label, icon: Icon, active = false, disabled = false, co
     <Link href={href} className={className} title={label}>
       {content}
     </Link>
-  );
-}
-
-function ThemeToggle() {
-  const t = useTranslations("nav");
-  const { theme, toggleTheme } = useTheme();
-  const isDark = theme === "dark";
-
-  return (
-    <Button
-      type="button"
-      variant="unstyled"
-      size="unstyled"
-      onClick={toggleTheme}
-      aria-pressed={isDark}
-      className="flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus-visible:bg-muted"
-    >
-      <span className="flex items-center gap-3">
-        {isDark ? <Moon className="size-4" aria-hidden="true" /> : <Sun className="size-4" aria-hidden="true" />}
-        {t("darkMode")}
-      </span>
-      <span
-        className={cn(
-          "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border transition-colors",
-          isDark ? "border-primary bg-primary" : "border-border bg-muted"
-        )}
-      >
-        <span
-          className={cn(
-            "inline-block size-4 translate-x-0.5 rounded-full border border-border bg-background shadow-sm transition-transform",
-            isDark ? "translate-x-4 border-transparent" : "translate-x-0.5"
-          )}
-        />
-      </span>
-    </Button>
   );
 }
