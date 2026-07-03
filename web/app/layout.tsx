@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTimeZone } from "next-intl/server";
 import { AppProviders } from "@/app/providers";
 import { THEME_INIT_SCRIPT } from "@/components/providers/ThemeProvider";
 import "@/styles/globals.css";
@@ -19,6 +19,7 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const timeZone = await getTimeZone();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -26,7 +27,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body>
-        <AppProviders locale={locale} messages={messages}>
+        <AppProviders locale={locale} messages={messages} timeZone={timeZone}>
           {children}
         </AppProviders>
       </body>

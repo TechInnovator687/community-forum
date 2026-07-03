@@ -18,6 +18,7 @@
     "shared/*.config.ts",
     "server/src/**/*.ts",
     "server/*.config.ts",
+    "web/app/**/*.ts",
     "web/app/**/*.tsx",
     "web/src/**/*.ts",
     "web/src/**/*.tsx",

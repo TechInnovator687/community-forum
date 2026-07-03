@@ -8,11 +8,12 @@ type AppProvidersProps = {
   children: ReactNode;
   locale: string;
   messages: AbstractIntlMessages;
+  timeZone: string;
 };
 
-export function AppProviders({ children, locale, messages }: AppProvidersProps) {
+export function AppProviders({ children, locale, messages, timeZone }: AppProvidersProps) {
   return (
-    <IntlProvider locale={locale} messages={messages}>
+    <IntlProvider locale={locale} messages={messages} timeZone={timeZone}>
       <ThemeProvider>
         <QueryProvider>
           <DemoUserProvider>{children}</DemoUserProvider>

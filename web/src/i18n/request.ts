@@ -11,6 +11,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
   return {
     locale,
-    messages: messages.default
+    messages: messages.default,
+    timeZone: "UTC"
   };
 });
