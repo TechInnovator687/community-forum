@@ -48,7 +48,7 @@ export function DemoUserSwitcher() {
 
   return (
     <div ref={containerRef} className="relative flex items-center gap-2">
-      <span className="hidden text-xs font-semibold uppercase tracking-wide text-muted-foreground sm:inline">
+      <span className="hidden text-xs font-semibold uppercase tracking-wide text-muted-foreground xl:inline">
         {t("demoUser.label")}
       </span>
       <Button
@@ -63,8 +63,8 @@ export function DemoUserSwitcher() {
         aria-label={t("demoUser.label")}
         className="flex h-10 items-center gap-2 rounded-md border border-border bg-muted/50 px-2.5 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-primary sm:px-3"
       >
-        <span className="truncate sm:hidden">{firstName}</span>
-        <span className="hidden truncate sm:inline">
+        <span className="truncate xl:hidden">{firstName}</span>
+        <span className="hidden truncate xl:inline">
           {user.name} — {t(`role.${user.role}`)}
         </span>
         <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />

@@ -48,11 +48,12 @@ export function AppHeaderActions() {
         variant="unstyled"
         size="unstyled"
         disabled
+        aria-label={t("createPost")}
         title={t("comingSoon")}
-        className="hidden h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:inline-flex"
+        className="hidden size-10 items-center justify-center rounded-md bg-primary text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:inline-flex lg:w-auto lg:px-4"
       >
         <Plus className="size-4" aria-hidden="true" />
-        <span className="hidden sm:inline">{t("createPost")}</span>
+        <span className="hidden lg:inline">{t("createPost")}</span>
       </Button>
       <ThemeToggleButton />
       <DemoUserSwitcher />
