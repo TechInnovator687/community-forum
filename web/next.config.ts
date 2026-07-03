@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
@@ -19,6 +19,14 @@ const nextConfig: NextConfig = {
 export default withNextIntl(nextConfig);
 
 function loadRootEnv() {
+  // The root .env is a local-dev convenience shared across the monorepo and
+  // is gitignored, so it never exists on Vercel/Render — those platforms
+  // inject real env vars into process.env directly. Skip silently instead
+  // of crashing the build when there's nothing to load.
+  if (!existsSync(rootEnvPath)) {
+    return;
+  }
+
   const entries = readFileSync(rootEnvPath, "utf8")
     .split(/\r?\n/u)
     .map((line) => line.trim())
