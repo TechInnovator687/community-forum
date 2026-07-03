@@ -1,4 +1,4 @@
-export * from "./auth";
-export * from "./error-handler";
-export * from "./validation";
+export * from "./AuthPlugin";
+export * from "./ErrorHandlerPlugin";
+export * from "./RequestValidation";
 

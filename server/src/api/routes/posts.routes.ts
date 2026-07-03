@@ -1,38 +1,44 @@
 import { Elysia } from "elysia";
 import { z } from "zod";
-import { assertCanAccessCourse } from "../authorization";
-import { authenticateRequest } from "../plugins/auth";
-import { ApiError } from "../plugins/error-handler";
-import { paginationQuerySchema, parseRequest } from "../plugins/validation";
-import type { ApiDependencies } from "../types";
+import { assertCanAccessCourse, assertModerator } from "../authorization";
+import { authenticateRequest } from "../plugins/AuthPlugin";
+import { ApiError } from "../plugins/ErrorHandlerPlugin";
+import { paginationQuerySchema, parseRequest } from "../plugins/RequestValidation";
+import type { ApiDependencies } from "../ApiTypes";
 
 const coursePostsParamsSchema = z.object({
   courseId: z.string().uuid()
 });
 
+const postIdParamsSchema = z.object({
+  postId: z.string().uuid()
+});
+
 export function createPostsRoutes(dependencies: ApiDependencies) {
-  return new Elysia({ name: "posts-routes" }).get(
-    "/courses/:courseId/posts",
-    async ({ params, query, request }) => {
+  return new Elysia({ name: "posts-routes" })
+    .get("/courses/:courseId/posts", async ({ params, query, request }) => {
       const user = authenticateRequest(request.headers);
       const { courseId } = parseRequest(coursePostsParamsSchema, params);
       const pagination = parseRequest(paginationQuerySchema, query);
 
       await assertCanAccessCourse(user, courseId, dependencies.enrollmentsRepository);
 
-      const result = await dependencies.postsService.getCourseFeed(user.id, courseId, pagination);
+      return dependencies.postsService.getCourseFeed(user.id, courseId, pagination);
+    })
+    .delete("/posts/:postId", async ({ params, request, set }) => {
+      const user = authenticateRequest(request.headers);
+      const { postId } = parseRequest(postIdParamsSchema, params);
 
-      return {
-        data: result.items,
-        pagination: {
-          page: result.page,
-          pageSize: result.pageSize,
-          totalItems: result.totalItems,
-          totalPages: result.totalPages
-        }
-      };
-    },
-  );
+      assertModerator(user);
+
+      const deleted = await dependencies.postsService.deletePost(postId);
+
+      if (!deleted) {
+        throw new ApiError(404, "NOT_FOUND", "Post was not found.");
+      }
+
+      set.status = 204;
+    });
 }
 
 export async function assertCanAccessPost(

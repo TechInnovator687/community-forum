@@ -151,8 +151,40 @@ describe("createSavedPostsService", () => {
     const result = await service.getSavedPosts(user.id, { page: 2, pageSize: 5 });
 
     expect(repository.getSavedPosts).toHaveBeenCalledWith(user.id, { limit: 5, offset: 5 });
-    expect(result.totalPages).toBe(3);
+    expect(result).toMatchObject({ page: 2, totalPages: 3, hasPreviousPage: true, hasNextPage: true });
     expect(result.items[0]).toMatchObject({ hasSaved: true, savesCount: 3 });
+  });
+
+  it("clamps an out-of-range page down to the last page for saved posts", async () => {
+    const repository = createRepository({
+      countSavedPosts: resolved(7),
+      getSaveCountsForPosts: resolved([]),
+      getSavedPosts: resolved([{ savedPost: createSavedPost(), post, author: user, course }])
+    });
+    const service = createSavedPostsService({ savedPostsRepository: repository });
+
+    const result = await service.getSavedPosts(user.id, { page: 50, pageSize: 5 });
+
+    expect(repository.getSavedPosts).toHaveBeenCalledWith(user.id, { limit: 5, offset: 5 });
+    expect(result).toMatchObject({ page: 2, totalPages: 2, hasPreviousPage: true, hasNextPage: false });
+  });
+
+  it("handles an empty saved-post list gracefully", async () => {
+    const repository = createRepository({ countSavedPosts: resolved(0) });
+    const service = createSavedPostsService({ savedPostsRepository: repository });
+
+    const result = await service.getSavedPosts(user.id);
+
+    expect(repository.getSavedPosts).toHaveBeenCalledWith(user.id, { limit: 5, offset: 0 });
+    expect(result).toMatchObject({
+      items: [],
+      page: 1,
+      pageSize: 5,
+      totalItems: 0,
+      totalPages: 0,
+      hasPreviousPage: false,
+      hasNextPage: false
+    });
   });
 
   it("delegates saved-state checks to the repository", async () => {

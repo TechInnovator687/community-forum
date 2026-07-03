@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ApiDependencies } from "./types";
+import type { ApiDependencies } from "./ApiTypes";
 import type { Course, Post, User } from "@server/db/schema";
 import type { HydratedFeedPost, HydratedPost } from "@server/services";
 
@@ -68,9 +68,12 @@ function createDependencies(overrides: Partial<ApiDependencies> = {}): ApiDepend
         page: 1,
         pageSize: 20,
         totalItems: 1,
-        totalPages: 1
+        totalPages: 1,
+        hasPreviousPage: false,
+        hasNextPage: false
       }),
-      getPost: resolved<HydratedPost | null>(hydratedPost)
+      getPost: resolved<HydratedPost | null>(hydratedPost),
+      deletePost: resolved<Post | null>(post)
     },
     savedPostsService: {
       getSavedPosts: resolved({
@@ -95,7 +98,9 @@ function createDependencies(overrides: Partial<ApiDependencies> = {}): ApiDepend
         page: 1,
         pageSize: 20,
         totalItems: 1,
-        totalPages: 1
+        totalPages: 1,
+        hasPreviousPage: false,
+        hasNextPage: false
       }),
       hasSaved: resolved(true),
       savePost: resolved({ id: "40000000-0000-4000-8000-000000000001" }),
@@ -107,7 +112,7 @@ function createDependencies(overrides: Partial<ApiDependencies> = {}): ApiDepend
 
 async function createTestApp(dependencies: ApiDependencies) {
   process.env.DATABASE_URL = "postgres://community_forum:community_forum@localhost:5432/community_forum";
-  const { createApp } = await import("../app");
+  const { createApp } = await import("../CreateApp");
 
   return createApp(dependencies);
 }
@@ -162,10 +167,30 @@ describe("api routes", () => {
       pageSize: 20
     });
     expect(body).toMatchObject({
-      pagination: {
-        totalItems: 1
+      totalItems: 1,
+      page: 1,
+      pageSize: 20,
+      hasPreviousPage: false,
+      hasNextPage: false
+    });
+  });
+
+  it("returns 400 when the page query parameter is invalid", async () => {
+    const dependencies = createDependencies();
+    const app = await createTestApp(dependencies);
+    const response = await app.handle(
+      new Request("http://localhost/api/me/saved-posts?page=-1", {
+        headers: authHeaders()
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    await expect(parseJson(response)).resolves.toMatchObject({
+      error: {
+        code: "VALIDATION_ERROR"
       }
     });
+    expectMock(dependencies.savedPostsService, "getSavedPosts").not.toHaveBeenCalled();
   });
 
   it("returns 401 when authentication headers are missing", async () => {
@@ -236,5 +261,51 @@ describe("api routes", () => {
 
     expect(response.status).toBe(404);
     expectMock(dependencies.savedPostsService, "savePost").not.toHaveBeenCalled();
+  });
+
+  it("deletes a post for a moderator", async () => {
+    const dependencies = createDependencies();
+    const app = await createTestApp(dependencies);
+    const response = await app.handle(
+      new Request(`http://localhost/api/posts/${postId}`, {
+        method: "DELETE",
+        headers: authHeaders(moderatorId, "moderator")
+      }),
+    );
+
+    expect(response.status).toBe(204);
+    expectMock(dependencies.postsService, "deletePost").toHaveBeenCalledWith(postId);
+  });
+
+  it("returns 403 when a student attempts to delete a post", async () => {
+    const dependencies = createDependencies();
+    const app = await createTestApp(dependencies);
+    const response = await app.handle(
+      new Request(`http://localhost/api/posts/${postId}`, {
+        method: "DELETE",
+        headers: authHeaders()
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    expectMock(dependencies.postsService, "deletePost").not.toHaveBeenCalled();
+  });
+
+  it("returns 404 when a moderator deletes a missing post", async () => {
+    const dependencies = createDependencies({
+      postsService: {
+        ...createDependencies().postsService,
+        deletePost: resolved<Post | null>(null)
+      }
+    });
+    const app = await createTestApp(dependencies);
+    const response = await app.handle(
+      new Request(`http://localhost/api/posts/${postId}`, {
+        method: "DELETE",
+        headers: authHeaders(moderatorId, "moderator")
+      }),
+    );
+
+    expect(response.status).toBe(404);
   });
 });

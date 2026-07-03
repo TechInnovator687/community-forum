@@ -1,5 +1,5 @@
-import type { ApiEnrollmentsRepository, AuthenticatedUser } from "./types";
-import { ApiError } from "./plugins/error-handler";
+import type { ApiEnrollmentsRepository, AuthenticatedUser } from "./ApiTypes";
+import { ApiError } from "./plugins/ErrorHandlerPlugin";
 
 export async function assertCanAccessCourse(
   user: AuthenticatedUser,
@@ -22,4 +22,3 @@ export function assertModerator(user: AuthenticatedUser): void {
     throw new ApiError(403, "FORBIDDEN", "Moderator access is required.");
   }
 }
-

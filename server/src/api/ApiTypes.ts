@@ -1,3 +1,4 @@
+import type { Post } from "@server/db/schema";
 import type { PaginatedResult, PaginationInput } from "@server/services";
 import type { HydratedFeedPost, HydratedPost } from "@server/services/posts.service";
 import type { HydratedSavedPost } from "@server/services/saved-posts.service";
@@ -16,6 +17,7 @@ export type ApiPostsService = {
     pagination?: PaginationInput,
   ): Promise<PaginatedResult<HydratedFeedPost>>;
   getPost(postId: string, userId?: string): Promise<HydratedPost | null>;
+  deletePost(postId: string): Promise<Post | null>;
 };
 
 export type ApiSavedPostsService = {

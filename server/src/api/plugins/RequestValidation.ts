@@ -1,5 +1,6 @@
 import { z, type ZodTypeAny } from "zod";
-import { ApiError } from "./error-handler";
+import { MAX_PAGE_SIZE } from "@server/services/PaginationService";
+import { ApiError } from "./ErrorHandlerPlugin";
 
 export const idParamSchema = z.object({
   courseId: z.string().uuid().optional(),
@@ -9,7 +10,7 @@ export const idParamSchema = z.object({
 export const paginationQuerySchema = z
   .object({
     page: z.coerce.number().int().positive().optional(),
-    pageSize: z.coerce.number().int().positive().max(100).optional()
+    pageSize: z.coerce.number().int().positive().max(MAX_PAGE_SIZE).optional()
   })
   .transform((query) => ({
     ...(query.page === undefined ? {} : { page: query.page }),

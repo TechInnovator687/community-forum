@@ -1,12 +1,19 @@
+import type { Post } from "@server/db/schema";
 import {
   postsRepository,
   savedPostsRepository,
   type FeedPost,
   type PostWithAuthorAndCourse
 } from "@server/repositories";
-import { createPaginatedResult, getPagination, type PaginatedResult, type PaginationInput } from "./pagination";
+import {
+  buildPaginatedResult,
+  normalizePaginationInput,
+  resolvePagination,
+  type PaginatedResult,
+  type PaginationInput
+} from "./PaginationService";
 
-type PostsRepository = Pick<typeof postsRepository, "countFeed" | "findById" | "findFeedByCourse">;
+type PostsRepository = Pick<typeof postsRepository, "countFeed" | "delete" | "findById" | "findFeedByCourse">;
 type SavedPostsRepository = Pick<
   typeof savedPostsRepository,
   "getSaveCountForPost" | "getSaveCountsForPosts" | "hasUserSavedPost" | "hasUserSavedPosts"
@@ -37,11 +44,13 @@ export function createPostsService(dependencies: PostsServiceDependencies = {}) 
       courseId: string,
       input: PaginationInput = {},
     ): Promise<PaginatedResult<HydratedFeedPost>> {
-      const pagination = getPagination(input);
-      const [feedPosts, totalItems] = await Promise.all([
-        postRepo.findFeedByCourse(courseId, pagination),
-        postRepo.countFeed(courseId)
-      ]);
+      const requested = normalizePaginationInput(input);
+      const totalItems = await postRepo.countFeed(courseId);
+      const resolved = resolvePagination(requested, totalItems);
+      const feedPosts = await postRepo.findFeedByCourse(courseId, {
+        limit: resolved.limit,
+        offset: resolved.offset
+      });
       const postIds = feedPosts.map((feedPost) => feedPost.post.id);
       const [saveCounts, savedMap] = await Promise.all([
         saveRepo.getSaveCountsForPosts(postIds),
@@ -56,7 +65,7 @@ export function createPostsService(dependencies: PostsServiceDependencies = {}) 
         savesCount: countMap.get(feedPost.post.id) ?? 0
       }));
 
-      return createPaginatedResult(items, totalItems, pagination);
+      return buildPaginatedResult(items, resolved);
     },
 
     async getPost(postId: string, userId?: string): Promise<HydratedPost | null> {
@@ -76,6 +85,10 @@ export function createPostsService(dependencies: PostsServiceDependencies = {}) 
         hasSaved,
         savesCount
       };
+    },
+
+    async deletePost(postId: string): Promise<Post | null> {
+      return postRepo.delete(postId);
     }
   };
 }

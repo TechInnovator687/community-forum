@@ -48,6 +48,7 @@ function createRepositories(overrides = {}) {
   return {
     postsRepository: {
       countFeed: resolved(0),
+      delete: resolved(null),
       findById: resolved(null),
       findFeedByCourse: resolved([])
     },
@@ -89,12 +90,17 @@ describe("createPostsService", () => {
     const result = await service.getCourseFeed(author.id, course.id, { page: 2, pageSize: 2 });
 
     expect(repositories.postsRepository.findFeedByCourse).toHaveBeenCalledWith(course.id, {
-      page: 2,
-      pageSize: 2,
       limit: 2,
       offset: 2
     });
-    expect(result).toMatchObject({ page: 2, pageSize: 2, totalItems: 7, totalPages: 4 });
+    expect(result).toMatchObject({
+      page: 2,
+      pageSize: 2,
+      totalItems: 7,
+      totalPages: 4,
+      hasPreviousPage: true,
+      hasNextPage: true
+    });
     expect(result.items).toEqual([
       { post: firstPost, author, course, hasSaved: true, savesCount: 4 },
       { post: secondPost, author, course, hasSaved: false, savesCount: 1 }
@@ -108,11 +114,30 @@ describe("createPostsService", () => {
     await service.getCourseFeed(author.id, course.id, { page: 0, pageSize: 250 });
 
     expect(repositories.postsRepository.findFeedByCourse).toHaveBeenCalledWith(course.id, {
-      page: 1,
-      pageSize: 100,
       limit: 100,
       offset: 0
     });
+  });
+
+  it("clamps an out-of-range page down to the last page and returns its items", async () => {
+    const firstPost = createPost("post-1");
+    const repositories = createRepositories({
+      postsRepository: {
+        countFeed: resolved(7),
+        findById: resolved(null),
+        findFeedByCourse: resolved([{ post: firstPost, author, course, saveCount: 0 }])
+      }
+    });
+    const service = createPostsService(repositories);
+
+    const result = await service.getCourseFeed(author.id, course.id, { page: 999, pageSize: 5 });
+
+    expect(repositories.postsRepository.findFeedByCourse).toHaveBeenCalledWith(course.id, {
+      limit: 5,
+      offset: 5
+    });
+    expect(result).toMatchObject({ page: 2, totalPages: 2, hasPreviousPage: true, hasNextPage: false });
+    expect(result.items).toHaveLength(1);
   });
 
   it("does not request save hydration for an empty feed", async () => {
@@ -159,5 +184,28 @@ describe("createPostsService", () => {
     await expect(service.getPost("missing-post", author.id)).resolves.toBeNull();
     expect(repositories.savedPostsRepository.getSaveCountForPost).not.toHaveBeenCalled();
     expect(repositories.savedPostsRepository.hasUserSavedPost).not.toHaveBeenCalled();
+  });
+
+  it("deletes a post by delegating to the repository", async () => {
+    const post = createPost("post-1");
+    const repositories = createRepositories({
+      postsRepository: {
+        countFeed: resolved(0),
+        delete: resolved(post),
+        findById: resolved(null),
+        findFeedByCourse: resolved([])
+      }
+    });
+    const service = createPostsService(repositories);
+
+    await expect(service.deletePost(post.id)).resolves.toEqual(post);
+    expect(repositories.postsRepository.delete).toHaveBeenCalledWith(post.id);
+  });
+
+  it("returns null when deleting a post that does not exist", async () => {
+    const repositories = createRepositories();
+    const service = createPostsService(repositories);
+
+    await expect(service.deletePost("missing-post")).resolves.toBeNull();
   });
 });

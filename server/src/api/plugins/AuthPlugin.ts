@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { z } from "zod";
-import type { AuthenticatedUser } from "../types";
-import { ApiError } from "./error-handler";
+import type { AuthenticatedUser } from "../ApiTypes";
+import { ApiError } from "./ErrorHandlerPlugin";
 
 const userIdSchema = z.string().uuid();
 const roleSchema = z.enum(["student", "moderator"]);

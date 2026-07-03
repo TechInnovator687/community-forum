@@ -1,9 +1,9 @@
 import { Elysia } from "elysia";
 import { z } from "zod";
-import { authenticateRequest } from "../plugins/auth";
-import { paginationQuerySchema, parseRequest } from "../plugins/validation";
+import { authenticateRequest } from "../plugins/AuthPlugin";
+import { paginationQuerySchema, parseRequest } from "../plugins/RequestValidation";
 import { assertCanAccessPost } from "./posts.routes";
-import type { ApiDependencies } from "../types";
+import type { ApiDependencies } from "../ApiTypes";
 
 const postParamsSchema = z.object({
   postId: z.string().uuid()
@@ -34,16 +34,7 @@ export function createSavedPostsRoutes(dependencies: ApiDependencies) {
     .get("/me/saved-posts", async ({ query, request }) => {
       const user = authenticateRequest(request.headers);
       const pagination = parseRequest(paginationQuerySchema, query);
-      const result = await dependencies.savedPostsService.getSavedPosts(user.id, pagination);
 
-      return {
-        data: result.items,
-        pagination: {
-          page: result.page,
-          pageSize: result.pageSize,
-          totalItems: result.totalItems,
-          totalPages: result.totalPages
-        }
-      };
+      return dependencies.savedPostsService.getSavedPosts(user.id, pagination);
     });
 }

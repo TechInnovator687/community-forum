@@ -1,9 +1,11 @@
+import { savedPostsRepository, type SavedPostWithPost } from "@server/repositories";
 import {
-  savedPostsRepository,
-  type SavedPostWithPost,
-  type SavedPostsPagination
-} from "@server/repositories";
-import { createPaginatedResult, getPagination, type PaginatedResult, type PaginationInput } from "./pagination";
+  buildPaginatedResult,
+  normalizePaginationInput,
+  resolvePagination,
+  type PaginatedResult,
+  type PaginationInput
+} from "./PaginationService";
 import { ServiceInvariantError } from "./service-errors";
 
 type SavedPostsRepository = Pick<
@@ -65,15 +67,13 @@ export function createSavedPostsService(dependencies: SavedPostsServiceDependenc
       userId: string,
       input: PaginationInput = {},
     ): Promise<PaginatedResult<HydratedSavedPost>> {
-      const pagination = getPagination(input);
-      const repositoryPagination: SavedPostsPagination = {
-        limit: pagination.limit,
-        offset: pagination.offset
-      };
-      const [savedPosts, totalItems] = await Promise.all([
-        saveRepo.getSavedPosts(userId, repositoryPagination),
-        saveRepo.countSavedPosts(userId)
-      ]);
+      const requested = normalizePaginationInput(input);
+      const totalItems = await saveRepo.countSavedPosts(userId);
+      const resolved = resolvePagination(requested, totalItems);
+      const savedPosts = await saveRepo.getSavedPosts(userId, {
+        limit: resolved.limit,
+        offset: resolved.offset
+      });
       const postIds = savedPosts.map((savedPost) => savedPost.post.id);
       const saveCounts = await saveRepo.getSaveCountsForPosts(postIds);
       const countMap = new Map(saveCounts.map((row) => [row.postId, row.saveCount]));
@@ -83,7 +83,7 @@ export function createSavedPostsService(dependencies: SavedPostsServiceDependenc
         savesCount: countMap.get(savedPost.post.id) ?? 0
       }));
 
-      return createPaginatedResult(items, totalItems, pagination);
+      return buildPaginatedResult(items, resolved);
     },
 
     async hasSaved(userId: string, postId: string): Promise<boolean> {
