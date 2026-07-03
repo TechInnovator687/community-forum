@@ -1,6 +1,7 @@
 "use client";
 
 import { QueryClient } from "@tanstack/react-query";
+import { DEFAULT_QUERY_STALE_TIME_MS } from "@/constants";
 
 let browserQueryClient: QueryClient | undefined;
 
@@ -8,7 +9,7 @@ function createQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60_000,
+        staleTime: DEFAULT_QUERY_STALE_TIME_MS,
         refetchOnWindowFocus: false
       }
     }

@@ -3,11 +3,10 @@ import { defaultLocale, locales } from "./routing";
 
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
-  const locale = requested && locales.includes(requested as (typeof locales)[number])
-    ? requested
-    : defaultLocale;
+  const locale =
+    requested && locales.includes(requested as (typeof locales)[number]) ? requested : defaultLocale;
   const messages = (await import(`../locales/${locale}.json`)) as {
-    default: Record<string, string>;
+    default: IntlMessages;
   };
 
   return {

@@ -1,0 +1,103 @@
+{
+  "common": {
+    "loading": "Cargando",
+    "close": "Cerrar",
+    "pagination": {
+      "label": "Paginacion",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "status": "Pagina {page} de {pageCount}"
+    },
+    "saves": "{count, plural, =0 {Sin guardados} one {# guardado} other {# guardados}}",
+    "view": {
+      "list": "Vista de lista",
+      "grid": "Vista de cuadricula"
+    }
+  },
+  "nav": {
+    "brand": "Community Forum",
+    "primaryNavLabel": "Principal",
+    "feed": "Actividad",
+    "myPosts": "Mis publicaciones",
+    "bookmarks": "Guardados",
+    "categories": {
+      "label": "Categorias",
+      "allDiscussions": "Todas las conversaciones",
+      "announcements": "Anuncios",
+      "webDevelopment": "Desarrollo web",
+      "design": "Diseno",
+      "career": "Carrera",
+      "aiMl": "IA y Machine Learning",
+      "general": "General",
+      "offTopic": "Otros temas"
+    },
+    "comingSoon": "Proximamente",
+    "demoUser": {
+      "label": "Usuario de prueba"
+    },
+    "role": {
+      "student": "Estudiante",
+      "moderator": "Moderador"
+    },
+    "darkMode": "Modo oscuro",
+    "searchPlaceholder": "Buscar conversaciones...",
+    "createPost": "Crear publicacion"
+  },
+  "feed": {
+    "title": "Actividad del curso",
+    "description": "Sigue las conversaciones recientes del curso y guarda publicaciones para despues.",
+    "sortMostRecent": "Mas reciente",
+    "empty": {
+      "title": "Todavia no hay publicaciones",
+      "description": "No hay conversaciones disponibles para este curso."
+    },
+    "error": {
+      "title": "No se pudieron cargar las publicaciones",
+      "description": "Intentalo de nuevo en un momento."
+    },
+    "bookmark": {
+      "save": "Guardar",
+      "remove": "Quitar"
+    },
+    "post": {
+      "byline": "Por {author} el {date}",
+      "delete": {
+        "action": "Eliminar publicacion",
+        "confirm": "¿Eliminar esta publicacion? Esta accion no se puede deshacer."
+      }
+    },
+    "rail": {
+      "activity": {
+        "title": "{count, plural, =0 {Todavia no hay conversaciones} one {# conversacion} other {# conversaciones}}",
+        "fallback": "Actividad de este curso"
+      },
+      "tip": {
+        "title": "Unete a la conversacion",
+        "description": "Guarda las publicaciones que quieras volver a leer y apareceran en tus Guardados."
+      }
+    }
+  },
+  "savedPosts": {
+    "title": "Publicaciones guardadas",
+    "description": "Publicaciones que guardaste para leer despues.",
+    "sortMostRecent": "Mas reciente",
+    "empty": {
+      "title": "No hay publicaciones guardadas",
+      "description": "Las conversaciones del curso que guardes apareceran aqui."
+    },
+    "error": {
+      "title": "No se pudieron cargar las publicaciones guardadas",
+      "description": "Intentalo de nuevo en un momento."
+    },
+    "rail": {
+      "total": {
+        "title": "{count, plural, =0 {Sin guardados todavia} one {# guardado} other {# guardados}}",
+        "description": "Total de publicaciones que guardaste"
+      },
+      "tip": {
+        "title": "Nunca pierdas una publicacion",
+        "description": "Guarda conversaciones importantes para leerlas y consultarlas mas tarde."
+      }
+    }
+  }
+}

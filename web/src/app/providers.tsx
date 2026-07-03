@@ -1,10 +1,8 @@
 "use client";
 
-import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
+import type { AbstractIntlMessages } from "next-intl";
 import type { ReactNode } from "react";
-import { getQueryClient } from "@/lib/query/client";
+import { DemoUserProvider, IntlProvider, QueryProvider, ThemeProvider } from "@/components/providers";
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -13,14 +11,13 @@ type AppProvidersProps = {
 };
 
 export function AppProviders({ children, locale, messages }: AppProvidersProps) {
-  const queryClient = getQueryClient();
-
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </NextIntlClientProvider>
+    <IntlProvider locale={locale} messages={messages}>
+      <ThemeProvider>
+        <QueryProvider>
+          <DemoUserProvider>{children}</DemoUserProvider>
+        </QueryProvider>
+      </ThemeProvider>
+    </IntlProvider>
   );
 }

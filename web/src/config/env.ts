@@ -3,7 +3,7 @@ import { z } from "zod";
 const clientEnvSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url(),
   NEXT_PUBLIC_API_URL: z.string().url(),
-  NEXT_PUBLIC_DEFAULT_LOCALE: z.string().default("en")
+  NEXT_PUBLIC_DEFAULT_LOCALE: z.enum(["en", "es"]).default("en")
 });
 
 export const clientEnv = clientEnvSchema.parse({
